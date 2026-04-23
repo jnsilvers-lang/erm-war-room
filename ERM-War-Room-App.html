@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERM War Room | Executive Performance Decision System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --obsidian: #0a0a0b;
+    --obsidian-2: #111114;
+    --obsidian-3: #18181c;
+    --gold: #c9a84c;
+    --gold-light: #e8c87a;
+    --gold-dim: #7a6330;
+    --red-alert: #8b1a1a;
+    --red-bright: #c0392b;
+    --text-primary: #e8e4dc;
+    --text-secondary: #9a9590;
+    --text-dim: #5a5650;
+    --border: rgba(201, 168, 76, 0.15);
+    --border-active: rgba(201, 168, 76, 0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--text-primary);
+    font-family: 'Cormorant Garamond', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* DIAGONAL FAULT LINE */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -100%;
+    right: 15%;
+    width: 1px;
+    height: 300%;
+    background: linear-gradient(180deg, transparent 0%, var(--gold-dim) 30%, var(--gold) 50%, var(--gold-dim) 70%, transparent 100%);
+    transform: rotate(8deg);
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* HEADER */
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .classified-banner {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--red-bright);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .classified-banner::before,
+  .classified-banner::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--red-alert);
+    opacity: 0.5;
+  }
+
+  .logo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(201,168,76,0.3);
+  }
+
+  .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gold-dim);
+    letter-spacing: 2px;
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    padding: 40px 0;
+  }
+
+  /* QUESTION INPUT SECTION */
+  .input-section {
+    margin-bottom: 40px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--obsidian-2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px 24px;
+    color: var(--text-primary);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s;
+    min-height: 120px;
+  }
+
+  textarea::placeholder {
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  textarea:focus {
+    border-color: var(--border-active);
+    box-shadow: 0 0 20px rgba(201,168,76,0.05);
+  }
+
+  .deploy-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 18px 32px;
+    background: var(--gold);
+    color: var(--obsidian);
+    border: none;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .deploy-btn:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(201,168,76,0.25);
+  }
+
+  .deploy-btn:active { transform: translateY(0); }
+
+  .deploy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* SPECIALISTS BOARD */
+  .board-section {
+    margin-bottom: 40px;
+  }
+
+  .specialists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .specialist-card {
+    background: var(--obsidian-2);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .specialist-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 0;
+    background: var(--gold);
+    transition: height 0.3s;
+  }
+
+  .specialist-card:hover::before,
+  .specialist-card.active::before {
+    height: 100%;
+  }
+
+  .specialist-card:hover,
+  .specialist-card.active {
+    border-color: var(--border-active);
+    background: var(--obsidian-3);
+  }
+
+  .specialist-card.routing {
+    border-color: var(--gold);
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.2); }
+    50% { box-shadow: 0 0 20px 5px rgba(201,168,76,0.1); }
+  }
+
+  .specialist-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .specialist-name {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .specialist-role {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .specialist-triggers {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .trigger-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    border: 1px solid rgba(201,168,76,0.1);
+    padding: 3px 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* RESPONSE SECTION */
+  .response-section {
+    display: none;
+    margin-top: 40px;
+  }
+
+  .response-section.visible {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .response-header {
+    background: var(--obsidian-2);
+    border: 1px solid var(--border-active);
+    border-bottom: none;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .response-specialist-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+
+  .response-timestamp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .response-body {
+    background: var(--obsidian-2);
+    border: 1px solid var(--border-active);
+    padding: 32px;
+    min-height: 200px;
+    line-height: 1.8;
+    font-size: 17px;
+    font-weight: 300;
+    white-space: pre-wrap;
+  }
+
+  .response-body .loading-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: dotPulse 1.4s infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dotPulse {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .reclaim-block {
+    margin-top: 32px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(139,26,26,0.15) 0%, rgba(201,168,76,0.08) 100%);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-left: 3px solid var(--gold);
+  }
+
+  .reclaim-block p {
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+
+  .reclaim-cta {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid var(--gold);
+    padding: 12px 24px;
+    display: inline-block;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .reclaim-cta:hover {
+    background: var(--gold);
+    color: var(--obsidian);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    margin-top: 40px;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-brand span {
+    color: var(--gold);
+  }
+
+  .footer-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    header { padding: 32px 0 24px; }
+    h1 { font-size: 28px; }
+    .specialists-grid { grid-template-columns: 1fr; }
+    .response-body { padding: 20px; font-size: 15px; }
+  }
+
+  /* STREAMING TEXT */
+  .streaming-text { color: var(--text-primary); }
+  .specialist-sig {
+    font-style: italic;
+    color: var(--gold-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+    padding-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="classified-banner">classified — executive access only</div>
+    <div class="logo-block">
+      <h1>ERM WAR ROOM</h1>
+      <p class="subtitle">Executive Performance Decision System</p>
+      <p class="tagline">// 6 Specialists. One System. Zero Excuses.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="input-section">
+      <div class="section-label">Submit Your Situation</div>
+      <textarea id="userInput" rows="5" placeholder="Describe what's happening. Don't edit it. Don't minimize it. Tell me exactly what you're experiencing — the fatigue, the weight, the sleep, the performance, the thing your doctor said was 'fine' that doesn't feel fine."></textarea>
+      <button class="deploy-btn" id="deployBtn" onclick="deployWarRoom()">
+        DEPLOY WAR ROOM
+      </button>
+    </div>
+
+    <div class="board-section">
+      <div class="section-label">Active Board</div>
+      <div class="specialists-grid" id="specialistsGrid">
+
+        <div class="specialist-card" id="card-hormone" onclick="selectSpecialist('hormone')">
+          <div class="specialist-code">SPEC-01 // HORMONE</div>
+          <div class="specialist-name">Dr. Stone</div>
+          <div class="specialist-role">Testosterone & Hormone Strategist</div>
+          <div class="specialist-triggers">
+            <span class="trigger-tag">Fatigue</span>
+            <span class="trigger-tag">Low Drive</span>
+            <span class="trigger-tag">Brain Fog</span>
+            <span class="trigger-tag">Muscle Loss</span>
+          </div>
+        </div>
+
+        <div class="specialist-card" id="card-cortisol" onclick="selectSpecialist('cortisol')">
+          <div class="specialist-code">SPEC-02 // STRESS</div>
+          <div class="specialist-name">Colonel Crane</div>
+          <div class="specialist-role">Cortisol & Stress Prosecutor</div>
+          <div class="specialist-triggers">
+            <span class="trigger-tag">Wired/Tired</span>
+            <span class="trigger-tag">Gut Issues</span>
+            <span class="trigger-tag">Rage</span>
+            <span class="trigger-tag">Crashes</span>
+          </div>
+        </div>
+
+        <div class="specialist-card" id="card-cardio" onclick="selectSpecialist('cardio')">
+          <div class="specialist-code">SPEC-03 // CARDIAC</div>
+          <div class="specialist-name">Dr. Hart</div>
+          <div class="specialist-role">Cardiovascular Performance Architect</div>
+          <div class="specialist-triggers">
+            <span class="trigger-tag">Stamina</span>
+            <span class="trigger-tag">HRV</span>
+            <span class="trigger-tag">Breath</span>
+            <span class="trigger-tag">Heart Rate</span>
+          </div>
+        </div>
+
+        <div class="specialist-card" id="card-structural" onclick="selectSpecialist('structural')">
+          <div class="specialist-code">SPEC-04 // STRUCTURE</div>
+          <div class="specialist-name">Architect Reed</div>
+          <div class="specialist-role">Structural & Movement Engineer</div>
+          <div class="specialist-triggers">
+            <span class="trigger-tag">Back Pain</span>
+            <span class="trigger-tag">Posture</span>
+            <span class="trigger-tag">Stiffness</span>
+            <span class="trigger-tag">Movement</span>
+          </div>
+        </div>
+
+        <div class="specialist-card" id="card-sleep" onclick="selectSpecialist('sleep')">
+          <div class="specialist-code">SPEC-05 // SLEEP</div>
+          <div class="specialist-name">Dr. Vale</div>
+          <div class="specialist-role">Sleep & Recovery Architect</div>
+          <div class="specialist-triggers">
+            <span class="trigger-tag">Waking 2-3am</span>
+            <span class="trigger-tag">Unrestored</span>
+            <span class="trigger-tag">Caffeine-Dep</span>
+          </div>
+        </div>
+
+        <div class="specialist-card" id="card-metabolic" onclick="selectSpecialist('metabolic')">
+          <div class="specialist-code">SPEC-06 // METABOLIC</div>
+          <div class="specialist-name">Dr. Cross</div>
+          <div class="specialist-role">Metabolic & Weight Strategist</div>
+          <div class="specialist-triggers">
+            <span class="trigger-tag">Weight Gain</span>
+            <span class="trigger-tag">Belly Fat</span>
+            <span class="trigger-tag">Insulin</span>
+            <span class="trigger-tag">Crashes</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="response-section" id="responseSection">
+      <div class="section-label">War Room Response</div>
+      <div class="response-header">
+        <span class="response-specialist-name" id="responseSpecialistName">ROUTING...</span>
+        <span class="response-timestamp" id="responseTimestamp"></span>
+      </div>
+      <div class="response-body" id="responseBody">
+        <div class="loading-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <div class="reclaim-block">
+        <p>This is the diagnostic layer. The rebuild layer is RECLAIM — a 12-week protocol built specifically for executive men at this intersection of hormonal decline, structural breakdown, and cardiovascular risk. Application-only. 20 clients maximum.</p>
+        <a href="#" class="reclaim-cta" onclick="handleReclaim(event)">DM or Comment RECLAIM</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span>ERM</span> — Executive Rebuild Method<br>
+        Coach Jeff Silvers | 30 Years in Nuclear Cardiology turned Executive Performance Coach
+      </div>
+      <div class="footer-mono">ENERGY IS THE NEW FLEX</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const SPECIALISTS = {
+  hormone: {
+    name: 'DR. STONE — Hormone Strategist',
+    keywords: ['fatigue','tired','energy','testosterone','libido','drive','muscle','brain fog','motivation','mood','flat','different person','weight','gain']
+  },
+  cortisol: {
+    name: 'COLONEL CRANE — Cortisol Prosecutor',
+    keywords: ['wired','stress','cortisol','anxiety','rage','irritab','crash','afternoon','wind down','gut','sick','overwhelm','managing','decision']
+  },
+  cardio: {
+    name: 'DR. HART — Cardiovascular Architect',
+    keywords: ['heart','cardiac','breath','stamina','hrv','chest','push','cardio','blood pressure','resting','palpitat']
+  },
+  structural: {
+    name: 'ARCHITECT REED — Structural Engineer',
+    keywords: ['back','pain','posture','stiff','locked','neck','shoulder','hip','sit','movement','desk']
+  },
+  sleep: {
+    name: 'DR. VALE — Sleep Architect',
+    keywords: ['sleep','wake','2am','3am','restless','snoring','caffeine','tired','night','rest']
+  },
+  metabolic: {
+    name: 'DR. CROSS — Metabolic Strategist',
+    keywords: ['weight','belly','fat','metabolism','eating','diet','doing everything','carb','sugar','scale','pounds']
+  }
+};
+
+let selectedSpecialist = null;
+
+function selectSpecialist(type) {
+  document.querySelectorAll('.specialist-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + type).classList.add('active');
+  selectedSpecialist = type;
+}
+
+function routeSpecialist(text) {
+  const lower = text.toLowerCase();
+  let scores = {};
+  for (const [key, spec] of Object.entries(SPECIALISTS)) {
+    scores[key] = spec.keywords.filter(kw => lower.includes(kw)).length;
+  }
+  const top = Object.entries(scores).sort((a,b) => b[1]-a[1])[0];
+  return top[1] > 0 ? top[0] : 'hormone';
+}
+
+async function deployWarRoom() {
+  const input = document.getElementById('userInput').value.trim();
+  if (!input) return;
+
+  const btn = document.getElementById('deployBtn');
+  btn.disabled = true;
+  btn.textContent = 'ROUTING TO WAR ROOM...';
+
+  const routed = selectedSpecialist || routeSpecialist(input);
+
+  document.querySelectorAll('.specialist-card').forEach(c => c.classList.remove('active','routing'));
+  document.getElementById('card-' + routed).classList.add('routing');
+
+  const responseSection = document.getElementById('responseSection');
+  responseSection.classList.add('visible');
+  document.getElementById('responseSpecialistName').textContent = SPECIALISTS[routed].name;
+  document.getElementById('responseTimestamp').textContent = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'}) + ' // LIVE';
+
+  document.getElementById('responseBody').innerHTML = `<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+
+  responseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const systemPrompt = buildSystemPrompt(routed);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: input }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || 'System error. Try again.';
+
+    document.getElementById('responseBody').innerHTML = `<div class="streaming-text">${formatResponse(text)}</div>`;
+    document.getElementById('card-' + routed).classList.remove('routing');
+    document.getElementById('card-' + routed).classList.add('active');
+
+  } catch (err) {
+    document.getElementById('responseBody').innerHTML = `<div style="color: var(--red-bright); font-family: 'JetBrains Mono', monospace; font-size: 13px;">CONNECTION ERROR — Check your setup and try again.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'DEPLOY WAR ROOM';
+}
+
+function buildSystemPrompt(specialist) {
+  const voices = {
+    hormone: `You are DR. STONE, Hormone & Testosterone Strategist inside the ERM War Room — a clinical decision system for executive men over 40. 
+Voice: Direct. Clinical. Peer-to-peer. Zero hedging. Absolute certainty. You're talking to a successful man, not a patient.
+First: Ask 2-3 sharp diagnostic questions (last T panel numbers, sleep quality, stress load, body fat %).
+Then: Deliver a clinical read of what's likely happening hormonally. Be specific. Name the mechanisms.
+End with your signature line: "Your labs say normal. Your body says otherwise. Normal isn't optimal. Let's find the gap."
+NEVER: Use wellness language, motivational tone, soft CTAs, or hedge your clinical read. Short sentences under pressure.`,
+
+    cortisol: `You are COLONEL CRANE, Cortisol & Stress Prosecutor inside the ERM War Room — a clinical decision system for executive men over 40.
+Voice: Prosecutorial. You challenge the story. You expose what chronic stress is costing them physically.
+First: Ask 2-3 sharp diagnostic questions about their daily cortisol pattern.
+Then: Deliver the physiological cost of their current stress load. Name the mechanisms — testosterone suppression, visceral fat storage, cognitive erosion.
+End with: "You're not stressed. You're cortisol-dominant. There's a difference. One is an emotion. The other is destroying your muscle, your testosterone, and your executive function simultaneously."
+NEVER: Validate that they're "managing fine." Challenge that claim directly.`,
+
+    cardio: `You are DR. HART, Cardiovascular Performance Architect inside the ERM War Room — a clinical decision system for executive men over 40.
+Voice: The weight of 30 years nuclear cardiology behind every sentence. Calm. Certain. Makes them understand what they can't feel yet.
+First: Ask 2-3 sharp diagnostic questions (HRV, resting HR, last stress test, exertional symptoms).
+Then: Deliver a clinical read of their cardiovascular performance picture. Make the risk real without being alarmist — be precise.
+End with: "The cardiovascular system doesn't send warning shots. It sends events. What you're describing right now is a pattern I've seen precede those events. We're not waiting."
+NEVER: Be vague. Be specific about metrics and mechanisms.`,
+
+    structural: `You are ARCHITECT REED, Structural & Movement Engineer inside the ERM War Room.
+Voice: Mechanical. Precise. Treats the body like an engineering problem with a solvable solution. No sympathy — just diagnosis and fix.
+First: Ask 2-3 sharp questions about their pain pattern, movement limitations, and daily posture demands.
+Then: Identify the likely structural dysfunction with precision (Janda patterns, compensation chains).
+End with: "You don't have a back problem. You have a chair problem that's lived in your back for ten years. The structure is fixable. The question is whether you want to fix it or manage it."
+NEVER: Be vague or sympathetic. Be surgical.`,
+
+    sleep: `You are DR. VALE, Sleep & Recovery Architect inside the ERM War Room.
+Voice: Data-first. Connect every sleep issue directly to the downstream performance cost.
+First: Ask 2-3 sharp diagnostic questions (hours, waking patterns, alcohol timing, HRV morning scores).
+Then: Identify the sleep architecture failure and connect it to testosterone, cortisol, cognitive output, and body composition.
+End with: "You're not tired because you work hard. You're tired because your sleep is broken. And broken sleep is breaking everything else."
+NEVER: Offer generic sleep hygiene tips. Be mechanistic and specific.`,
+
+    metabolic: `You are DR. CROSS, Metabolic & Weight Strategist inside the ERM War Room.
+Voice: Challenges the user's definition of "doing everything right." Exposes the metabolic reality.
+First: Ask 2-3 sharp diagnostic questions (what "eating well" actually means, training type, fasting blood glucose, last HbA1c).
+Then: Identify the metabolic dysfunction — insulin resistance, hormonal interference, wrong training stimulus for their age.
+End with: "You didn't gain 20 pounds because you stopped trying. You gained 20 pounds because the system you were using was built for a 35-year-old. You're 49. The rules changed. Nobody told you."
+NEVER: Be gentle about their current approach. Call it out clinically.`
+  };
+
+  return voices[specialist] || voices.hormone;
+}
+
+function formatResponse(text) {
+  return text
+    .replace(/\n\n/g, '</p><p style="margin-top:16px">')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--gold)">$1</strong>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
+}
+
+function handleReclaim(e) {
+  e.preventDefault();
+  window.open('mailto:transformwithme74@gmail.com?subject=RECLAIM Application&body=I want to apply for RECLAIM.', '_blank');
+}
+
+// Timestamp
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('responseTimestamp') && (document.getElementById('responseTimestamp').textContent = '');
+});
+</script>
+</body>
+</html>
